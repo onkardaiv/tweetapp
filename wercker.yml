@@ -20,8 +20,8 @@
    after-steps:                    
      - slack-notifier:
          url: $SLACK_URL
-         username: ranjithraj2035
-         channel: 
+         username: DaivOnkar
+         channel: random
  push-2-docker:
    box: nginx:latest
    
@@ -41,7 +41,7 @@
          password: $DOCKER_PASSWORD
          # we want to push both the release image and as the latest
          tag: dev-$WERCKER_GIT_COMMIT latest
-         repository: ranjithraj2035/kube-doc-rep
+         repository: onkardaiv/tweetapp
          registry: https://hub.docker.com
          ports: 80 443
          cmd: nginx -g 'daemon off';
@@ -50,30 +50,30 @@
    box: node:latest
    steps:
      - wercker/add-ssh-key:
-         keyname: ranjith_tweet
+         keyname: onkar-tweetapp
      - add-to-known_hosts:
          hostname: $DEV_REMOTE_HOST
      - script:
          name: Pull newest docker images
          code: |
-           ssh $DEV_REMOTE_USER@$DEV_REMOTE_HOST sudo docker pull ranjithraj2035/kube-doc-rep
+           ssh $DEV_REMOTE_USER@$DEV_REMOTE_HOST sudo docker pull onkardaiv/tweetapp
      - script:
          name: Stop all running containers
          code: |
-           ssh $DEV_REMOTE_USER@$DEV_REMOTE_HOST sudo docker stop ranjith-kube  || echo ‘failed to stop running container’
+           ssh $DEV_REMOTE_USER@$DEV_REMOTE_HOST sudo docker stop tweetapp  || echo ‘failed to stop running container’
      - script:
          name: Remove stopped service/containers
          code: |
-           ssh $DEV_REMOTE_USER@$DEV_REMOTE_HOST sudo docker rm ranjith-kube  || echo ‘failed to remove stopped container’
+           ssh $DEV_REMOTE_USER@$DEV_REMOTE_HOST sudo docker rm tweetapp  || echo ‘failed to remove stopped container’
      - script:
          name: Remove image behind stopped container
          code: |
-           ssh $DEV_REMOTE_USER@$DEV_REMOTE_HOST sudo docker rmi ranjithraj2035/kube-doc-rep:current || echo ‘failed to remove image behind stopped container’
+           ssh $DEV_REMOTE_USER@$DEV_REMOTE_HOST sudo docker rmi onkardaiv/tweetapp:current || echo ‘failed to remove image behind stopped container’
      - script:
          name: Tag the pulled image
          code: |
-           ssh $DEV_REMOTE_USER@$DEV_REMOTE_HOST sudo docker tag ranjithraj2035/kube-doc-rep:latest ranjithraj2035/kube-doc-rep:current
+           ssh $DEV_REMOTE_USER@$DEV_REMOTE_HOST sudo docker tag onkardaiv/tweetapp:latest onkardaiv/tweetapp:current
      - script:
          name: Start all services/containers
          code: |
-           ssh $DEV_REMOTE_USER@$DEV_REMOTE_HOST sudo docker container run --detach -p 777:80 --name ranjith-kube ranjithraj2035/kube-doc-rep:current
+           ssh $DEV_REMOTE_USER@$DEV_REMOTE_HOST sudo docker container run --detach -p 777:80 --name tweetapp onkardaiv/tweetapp:current
